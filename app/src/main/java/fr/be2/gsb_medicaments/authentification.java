@@ -23,8 +23,8 @@ public class authentification extends AppCompatActivity {
         setContentView(R.layout.activity_authentification);
         CodeV = findViewById(R.id.codeV);
         myKey = findViewById(R.id.myKey);
-       LayoutCle = findViewById(R.id.layoutCle);
-       LayoutCle.setVisibility(View.INVISIBLE);
+        LayoutCle = findViewById(R.id.layoutCle);
+        LayoutCle.setVisibility(View.INVISIBLE);
 
 
     }
