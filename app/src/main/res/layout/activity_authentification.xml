@@ -20,6 +20,7 @@
         android:id="@+id/btnValiderCodeV"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:onClick="AfficheLayout"
         android:text="Valider"/>
     <LinearLayout
         android:orientation="vertical"
@@ -37,7 +38,14 @@
             android:id="@+id/btnValiderCle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="ficheLayout"
+            android:onClick="boutton2"
             android:text="Valider"/>
+        <Button
+            android:id="@+id/btnDeconnexion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="deconnexion"
+            android:text="Deconnexion"/>
+
     </LinearLayout>
 </LinearLayout>
