@@ -57,8 +57,9 @@
         android:layout_weight="1"/>
 
     <Button
-        android:id="@+id/button"
-        android:layout_width="match_parent"
+        android:id="@+id/btnDeconnexion"
+        android:layout_width="194dp"
         android:layout_height="wrap_content"
-        android:text="Deconnexion " />
+        android:onClick="deconnexion"
+        android:text="Deconnexion" />
 </LinearLayout>

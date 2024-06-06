@@ -1,5 +1,8 @@
 package fr.be2.gsb_medicaments;
+
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -11,7 +14,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
+
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.io.CharArrayWriter;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -23,14 +29,15 @@ public class MainActivity extends AppCompatActivity {
     private DatabaseHelper dbHelper;
     private static final String PREF_NAME = "UserPrefs";
     private static final String KEY_USER_STATUS = "userStatus";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_main);
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
         if (!isUserAuthenticated()) {
             // L'utilisateur n'est pas authentifié, redirigez vers l'activité d'authentificationsuper.onCreate(savedInstanceState);
             Intent authIntent = new Intent(this, authentification.class);
-            setContentView(R.layout.activity_main);
             startActivity(authIntent);
             finish(); // Terminez l'activité principale pour éviter qu'elle ne soit accessible avec le bouton "Retour"// Initialize UI components
         }
@@ -57,6 +64,17 @@ public class MainActivity extends AppCompatActivity {
                 cacherClavier();
             }
         });
+        listViewResults.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                                   @Override
+                                                   public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                                                       // Get the selected item
+                                                       Medicament selectedMedicament = (Medicament) adapterView.getItemAtPosition(position);
+                                                       // Show composition of the selected medicament
+                                                       afficherCompositionMedicament(selectedMedicament);
+                                                   }
+                                               }
+        );
+
     }
 
     private void setupVoiesAdminSpinner() {
@@ -97,17 +115,64 @@ public class MainActivity extends AppCompatActivity {
             imm.hideSoftInputFromWindow(vueCourante.getWindowToken(), 0);
         }
     }
-     private boolean isUserAuthenticated() {
-              SharedPreferences preferences = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
-               // SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-                      String userStatus = preferences.getString(KEY_USER_STATUS, "");
-                        // Vérifiez si la chaîne d'état de l'utilisateur est "Authentifie=OK"
-                              return "Authentifie=OK".equals(userStatus);
-                    }
-    public void Deconnexion (View v){
+
+    private boolean isUserAuthenticated() {
+        SharedPreferences preferences = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        // SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String userStatus = preferences.getString(KEY_USER_STATUS, "");
+        // Vérifiez si la chaîne d'état de l'utilisateur est "Authentifie=OK"
+        return "authentification=OK".equals(userStatus);
+    }
+
+    public void deconnexion(View v) {
+        setUserStatus("authentification=KO");
         Intent authIntent = new Intent(this, authentification.class);
         startActivity(authIntent);
         finish();
 
+    }
+
+    private void setUserStatus(String status) {
+        SharedPreferences sharedPreferences = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(KEY_USER_STATUS, status);
+        editor.apply();
+    }
+
+    private void afficherCompositionMedicament(Medicament medicament) {
+        List<String> composition = dbHelper.getCompositionMedicament(medicament.getCodeCIS());
+        List<String> presentation = dbHelper.getPresentationMedicament(medicament.getCodeCIS());
+
+        // Afficher la composition et la presentation du médicament dans une boîte de dialogue ou autre méthode d'affichage
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Composition et presentation" + medicament.getDenomination());
+        StringBuilder BoiteText = new StringBuilder();
+        if (composition.isEmpty()) {
+            BoiteText.append("Aucune composition disponible pour ce médicament.");
+        } else {
+            BoiteText.append("Composition : \n");
+            for (String item : composition) {
+                BoiteText.append(item).append("\n");
+            }
+           // StringBuilder presentationText = new StringBuilder();
+            if (presentation.isEmpty()) {
+                BoiteText.append("Aucune presentation disponible pour ce médicament.");
+            } else {
+                BoiteText.append("Présentations : \n");
+
+                for (String item : presentation) {
+                    BoiteText.append(item).append("\n");
+                }
+
+            }
+            builder.setMessage(BoiteText.toString());
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        }
     }
 }

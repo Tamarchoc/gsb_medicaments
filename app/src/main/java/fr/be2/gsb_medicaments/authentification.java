@@ -27,7 +27,6 @@ public class authentification extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_authentification);
-        setUserStatus("KO");
         codeV = findViewById (R.id.codeV);
         myKey = findViewById (R.id.myKey);
         layoutCle = findViewById (R.id.layoutCle);
@@ -42,10 +41,10 @@ public class authentification extends AppCompatActivity {
 
         // Vous pouvez maintenant utiliser la méthode sendKeyByEmail
         // avec le codeV, secureKey, et token comme paramètres
-        String secureKey = "myRandomKey";
+        String secureKey = myRandomKey;
         String token = SECURETOKEN;
         SendKeyTask sendKeyTask = new SendKeyTask(getApplicationContext());
-        sendKeyTask.execute(codeVisiteur, secureKey, token);
+        sendKeyTask.execute(codeVisiteur,myRandomKey,SECURETOKEN);
 
     }
     private String genererChaineAleatoire(int longueur) {
@@ -63,15 +62,16 @@ public class authentification extends AppCompatActivity {
         return chaineAleatoire.toString();
 }
     public void boutton2(View v){
-        String clesecrete = myKey.getText().toString().trim();
-        if (clesecrete.equals(myRandomKey)) {
-            showToast( "Les chaînes A et B sont égales.");
+        String cleSecrete = myKey.getText().toString().trim();
+        if (cleSecrete.equals(myRandomKey)) {
+            showToast("Les chaînes A et B sont égales.");
             setUserStatus("authentification=OK");
+            Intent authIntent = new Intent(this, MainActivity.class);
+            startActivity(authIntent);
         } else {
             showToast("Les chaînes A et B ne sont pas égales.");
             setUserStatus("authentification=KO");
         }
-
     }
 
     private void showToast(String montexte) {
@@ -83,9 +83,5 @@ public class authentification extends AppCompatActivity {
         editor.putString(KEY_USER_STATUS, status);
         editor.apply();
     }
-    public void deconnexion(View view) {
-        Intent authIntent = new Intent(this, authentification.class);
-        startActivity(authIntent);
-        finish();
-    }
+
 }
